@@ -1,6 +1,11 @@
+using EventIngestionAPI.Endpoints;
+using EventIngestionAPI.Infrastructure.Data.EntityFramework;
+
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+builder.Services.AddSqlServerDatastore(builder.Configuration);
+
+app.RegisterEndpoints();
 
 app.Run();
