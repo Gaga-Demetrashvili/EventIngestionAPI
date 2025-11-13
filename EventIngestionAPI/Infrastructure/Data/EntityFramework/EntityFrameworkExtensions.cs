@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EventIngestionAPI.Infrastructure.Data.EntityFramework;
 
@@ -8,7 +9,8 @@ public static class EntityFrameworkExtensions
         IConfiguration configuration)
     {
         services.AddDbContext<MappingRuleContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
         services.AddScoped<IMappingRuleStore, MappingRuleContext>();
     }

@@ -32,7 +32,7 @@ public class MappingRuleConfiguration : IEntityTypeConfiguration<MappingRule>
                 ExternalField = "usr",
                 InternalField = "PlayerId",
                 IsActive = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = new DateTime(2025, 11, 12)
             },
             new MappingRule
             {
@@ -40,7 +40,7 @@ public class MappingRuleConfiguration : IEntityTypeConfiguration<MappingRule>
                 ExternalField = "amt",
                 InternalField = "Amount",
                 IsActive = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = new DateTime(2025, 11, 13)
             }
         );
     }
