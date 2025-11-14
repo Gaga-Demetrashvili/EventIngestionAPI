@@ -10,4 +10,9 @@ var app = builder.Build();
 app.RegisterEventIngestionApiEndpoints();
 app.RegisterMappingRuleApiEndpoints();
 
+if (app.Configuration.GetValue<bool>("RunMigrationsOnStartup"))
+{
+    app.MigrateDatabase();
+}
+
 app.Run();
