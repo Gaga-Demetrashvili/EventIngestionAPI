@@ -46,7 +46,9 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<int>("MappingRuleTypeId")
                         .HasColumnType("int");

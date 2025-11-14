@@ -34,7 +34,7 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ExternalField = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     InternalField = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     MappingRuleTypeId = table.Column<int>(type: "int", nullable: false)

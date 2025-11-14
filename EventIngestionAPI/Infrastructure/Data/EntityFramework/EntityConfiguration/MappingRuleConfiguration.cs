@@ -19,10 +19,9 @@ public class MappingRuleConfiguration : IEntityTypeConfiguration<MappingRule>
             .HasMaxLength(100);
 
         builder.Property(mr => mr.IsActive)
-            .IsRequired();
+            .HasDefaultValue(true);
 
         builder.Property(mr => mr.CreatedAt)
-            .IsRequired()
             .HasDefaultValueSql("GETDATE()");
 
         builder.HasOne(mr => mr.MappingRuleType)

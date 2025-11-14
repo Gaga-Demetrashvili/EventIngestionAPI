@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
 {
     [DbContext(typeof(MappingRuleContext))]
-    [Migration("20251114151904_Initial")]
+    [Migration("20251114155740_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -49,7 +49,9 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<int>("MappingRuleTypeId")
                         .HasColumnType("int");
