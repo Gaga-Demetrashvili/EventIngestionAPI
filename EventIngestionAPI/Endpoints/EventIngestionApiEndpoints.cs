@@ -2,9 +2,9 @@
 
 namespace EventIngestionAPI.Endpoints;
 
-public static class EventIngestionEndpoints
+public static class EventIngestionApiEndpoints
 {
-    public static void RegisterEndpoints(this IEndpointRouteBuilder routeBuilder)
+    public static void RegisterEventIngestionApiEndpoints(this IEndpointRouteBuilder routeBuilder)
     {
         routeBuilder.MapPost("/events", IngestEvent);
     }

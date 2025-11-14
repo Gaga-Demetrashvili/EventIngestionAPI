@@ -18,10 +18,10 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
         throw new NotImplementedException();
     }
 
-    public Task<MappingRule?> GetAll(bool onlyActive, bool trackChanges)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<IEnumerable<MappingRule>?> GetAll(bool trackChanges) =>
+        trackChanges 
+        ? await MappingRules.AsNoTracking().ToListAsync()
+        : await MappingRules.ToListAsync();
 
     public Task UpdateMappingRule(MappingRule mappingRule)
     {
