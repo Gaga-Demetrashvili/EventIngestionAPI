@@ -13,13 +13,18 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
 
     public DbSet<MappingRule> MappingRules { get; set; }
 
+    public async Task<MappingRule?> GetById(int id, bool trackChanges) =>
+        !trackChanges
+        ? await MappingRules.AsNoTracking().FirstOrDefaultAsync(mr => mr.Id == id)
+        : await MappingRules.FirstOrDefaultAsync(mr => mr.Id == id);
+
     public Task CreateMappingRule(MappingRule mappingRule)
     {
         throw new NotImplementedException();
     }
 
     public async Task<IEnumerable<MappingRule>?> GetAll(bool trackChanges) =>
-        trackChanges 
+        !trackChanges 
         ? await MappingRules.AsNoTracking().ToListAsync()
         : await MappingRules.ToListAsync();
 
