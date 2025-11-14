@@ -12,6 +12,7 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
     }
 
     public DbSet<MappingRule> MappingRules { get; set; }
+    public DbSet<MappingRuleType> MappingRuleTypes { get; set; }
 
     public async Task<MappingRule?> GetById(int id, bool trackChanges) =>
         !trackChanges
@@ -36,5 +37,6 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new MappingRuleConfiguration());
+        modelBuilder.ApplyConfiguration(new MappingRuleTypeConfiguration());
     }
 }

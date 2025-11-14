@@ -14,6 +14,19 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "MappingRuleTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Type = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MappingRuleTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MappingRules",
                 columns: table => new
                 {
@@ -23,21 +36,33 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
                     InternalField = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MappingRuleTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MappingRules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MappingRules_MappingRuleTypes_MappingRuleTypeId",
+                        column: x => x.MappingRuleTypeId,
+                        principalTable: "MappingRuleTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "MappingRules",
-                columns: new[] { "Id", "CreatedAt", "ExternalField", "InternalField", "IsActive", "UpdatedAt" },
+                table: "MappingRuleTypes",
+                columns: new[] { "Id", "Type" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "usr", "PlayerId", true, null },
-                    { 2, new DateTime(2025, 11, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "amt", "Amount", true, null }
+                    { 1, "default" },
+                    { 2, "dynamic" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MappingRules_MappingRuleTypeId",
+                table: "MappingRules",
+                column: "MappingRuleTypeId");
         }
 
         /// <inheritdoc />
@@ -45,6 +70,9 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
         {
             migrationBuilder.DropTable(
                 name: "MappingRules");
+
+            migrationBuilder.DropTable(
+                name: "MappingRuleTypes");
         }
     }
 }

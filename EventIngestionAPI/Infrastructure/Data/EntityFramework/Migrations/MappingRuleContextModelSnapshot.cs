@@ -48,30 +48,58 @@ namespace EventIngestionAPI.Infrastructure.Data.EntityFramework.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MappingRuleTypeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MappingRuleTypeId");
+
                     b.ToTable("MappingRules");
+                });
+
+            modelBuilder.Entity("EventIngestionAPI.Entities.MappingRuleType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MappingRuleTypes");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ExternalField = "usr",
-                            InternalField = "PlayerId",
-                            IsActive = true
+                            Type = "default"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 11, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ExternalField = "amt",
-                            InternalField = "Amount",
-                            IsActive = true
+                            Type = "dynamic"
                         });
+                });
+
+            modelBuilder.Entity("EventIngestionAPI.Entities.MappingRule", b =>
+                {
+                    b.HasOne("EventIngestionAPI.Entities.MappingRuleType", "MappingRuleType")
+                        .WithMany()
+                        .HasForeignKey("MappingRuleTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MappingRuleType");
                 });
 #pragma warning restore 612, 618
         }

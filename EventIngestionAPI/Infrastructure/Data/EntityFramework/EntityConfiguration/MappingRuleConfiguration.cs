@@ -25,23 +25,7 @@ public class MappingRuleConfiguration : IEntityTypeConfiguration<MappingRule>
             .IsRequired()
             .HasDefaultValueSql("GETDATE()");
 
-        builder.HasData(
-            new MappingRule
-            {
-                Id = 1,
-                ExternalField = "usr",
-                InternalField = "PlayerId",
-                IsActive = true,
-                CreatedAt = new DateTime(2025, 11, 12)
-            },
-            new MappingRule
-            {
-                Id = 2,
-                ExternalField = "amt",
-                InternalField = "Amount",
-                IsActive = true,
-                CreatedAt = new DateTime(2025, 11, 13)
-            }
-        );
+        builder.HasOne(mr => mr.MappingRuleType)
+            .WithMany();
     }
 }
