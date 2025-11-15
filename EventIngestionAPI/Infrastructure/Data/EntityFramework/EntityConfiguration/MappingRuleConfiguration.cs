@@ -15,6 +15,9 @@ public class MappingRuleConfiguration : IEntityTypeConfiguration<MappingRule>
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.HasIndex(mr => mr.ExternalField)
+            .IsUnique();
+
         builder.Property(mr => mr.InternalField)
             .IsRequired()
             .HasMaxLength(100);
