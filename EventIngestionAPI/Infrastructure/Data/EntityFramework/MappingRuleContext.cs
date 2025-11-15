@@ -19,9 +19,10 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
         ? await MappingRules.AsNoTracking().FirstOrDefaultAsync(mr => mr.Id == id)
         : await MappingRules.FirstOrDefaultAsync(mr => mr.Id == id);
 
-    public Task CreateMappingRule(MappingRule mappingRule)
+    public async Task CreateMappingRule(MappingRule mappingRule)
     {
-        throw new NotImplementedException();
+        MappingRules.Add(mappingRule);
+        await SaveChangesAsync();
     }
 
     public async Task<IEnumerable<MappingRule>?> GetAll(bool trackChanges) =>
@@ -29,9 +30,10 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
         ? await MappingRules.AsNoTracking().ToListAsync()
         : await MappingRules.ToListAsync();
 
-    public Task UpdateMappingRule(MappingRule mappingRule)
+    public async Task UpdateMappingRule(MappingRule mappingRule)
     {
-        throw new NotImplementedException();
+        MappingRules.Add(mappingRule);
+        await SaveChangesAsync();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,0 +1,3 @@
+﻿namespace EventIngestionAPI.ApiModels;
+
+public record MappingRuleForCreationDto : MappingRuleForManipulationDto;
