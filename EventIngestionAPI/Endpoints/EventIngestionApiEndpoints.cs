@@ -1,4 +1,8 @@
-﻿using System.Text.Json;
+﻿using EventIngestionAPI.Infrastructure.Services;
+using EventIngestionAPI.IntegrationEvents;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace EventIngestionAPI.Endpoints;
 
@@ -9,12 +13,19 @@ public static class EventIngestionApiEndpoints
         routeBuilder.MapPost("/events", IngestEvent);
     }
 
-    internal static async Task<IResult> IngestEvent(JsonElement payload)
+    internal static async Task<IResult> IngestEvent(JsonElement payload,
+        [FromServices] IEventMapper eventMapper,
+        [FromServices] IValidator<InternalEvent> validator)
     {
+        var internalEvent = await eventMapper.Map(payload);
+        var validationResult = validator.Validate(internalEvent);
+        if (!validationResult.IsValid)
+            return Results.UnprocessableEntity(validationResult.ToDictionary());
+
         return Results.Ok(new
         {
             message = "Event ingested successfully.",
-            data = payload
+            data = internalEvent
         });
     }
 }

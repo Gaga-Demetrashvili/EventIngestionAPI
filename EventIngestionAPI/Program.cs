@@ -1,11 +1,13 @@
 using EventIngestionAPI.Endpoints;
 using EventIngestionAPI.Infrastructure.Data.EntityFramework;
+using EventIngestionAPI.Infrastructure.Services;
 using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSqlServerDatastore(builder.Configuration);
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddSingleton<IEventMapper, EventMapper>();
 
 var app = builder.Build();
 
