@@ -13,6 +13,7 @@ public static class MappingRuleApiEndpoints
         routeBuilder.MapGet("/mapping-rules", GetMappingRules);
         routeBuilder.MapPost("/mapping-rules", CreateMappingRule);
         routeBuilder.MapPut("/mapping-rules/{id:int}", UpdateMappingRule);
+        routeBuilder.MapDelete("/mapping-rules/{id:int}", DeleteMappingRule);
     }
 
     internal static async Task<IResult> GetMappingRules([FromServices] IMappingRuleStore mappingRuleStore)
@@ -72,6 +73,18 @@ public static class MappingRuleApiEndpoints
         mappingRuleEntity.UpdatedAt = DateTime.Now;
 
         await mappingRuleStore.UpdateMappingRule(mappingRuleEntity);
+
+        return TypedResults.NoContent();
+    }
+
+    internal static async Task<IResult> DeleteMappingRule(int id,
+        [FromServices] IMappingRuleStore mappingRuleStore)
+    {
+        var mappingRuleEntity = await mappingRuleStore.GetById(id, trackChanges: false);
+        if (mappingRuleEntity is null)
+            return Results.NotFound($"Mapping rule with id: {id} was not found.");
+
+        await mappingRuleStore.DeleteMappingRule(mappingRuleEntity);
 
         return TypedResults.NoContent();
     }
