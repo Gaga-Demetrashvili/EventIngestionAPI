@@ -32,7 +32,7 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
 
     public async Task UpdateMappingRule(MappingRule mappingRule)
     {
-        MappingRules.Add(mappingRule);
+        MappingRules.Update(mappingRule);
         await SaveChangesAsync();
     }
 
