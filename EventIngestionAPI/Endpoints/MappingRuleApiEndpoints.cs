@@ -73,6 +73,6 @@ public static class MappingRuleApiEndpoints
 
         await mappingRuleStore.UpdateMappingRule(mappingRuleEntity);
 
-        return Results.NoContent();
+        return TypedResults.NoContent();
     }
 }
