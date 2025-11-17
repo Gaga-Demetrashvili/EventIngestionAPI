@@ -1,73 +1,160 @@
-# OnAim---Integration-Engineer-Task
+# Event Ingestion API
 
-Integration Engineer Task for OnAim — A .NET Web API that receives external event payloads, validates and maps them into OnAim’s internal event format, and publishes them. Field mapping rules are dynamic and can be modified at runtime via API endpoints.
+A .NET Web API that receives external event payloads, validates and maps them into an internal event format, and publishes them to RabbitMQ. Field mapping rules are dynamic and can be modified at runtime via API endpoints.
 
-API Documentation
+---
 
-# How to run project
+## 🚀 Getting Started
 
-"ConnectionStrings": {
-"DefaultConnection": "Server={YourRemoteOrLocalDBServer}";
-}
+### Prerequisites
+- .NET 9.0 SDK
+- SQL Server (local or remote)
+- RabbitMQ (local or remote)
 
-"RabbitMq": {
-"Hostname": "{YourRemoteOrLocalRabbitMqServer}"
-}
+### Configuration
 
-In order initial db migrations to be applied on the start of API
-"RunMigrationsOnStartup": true
+Update `appsettings.json` with your database and RabbitMQ connection details:
 
-When running project for the first time migration seeds default MappingRules data in the EventIngestionDb.dbo.MappingRules table
-
-# How to use API
-
-## API Endpoints for MappingRules CRUD operations
-
-GET - https://localhost:7077/mapping-rules - Gets All mapping rules (dynamic and default)
-
-POST - https://localhost:7077/mapping-rules - Creates Mapping Rule
-Reques body:
+```json
 {
-"externalField": "usr",
-"internalField": "PlayerId",
-"mappingRuleTypeId": 1/2 (1 - default, 2 - dynamic)
-"IsActive": true/false (Optional property. If not passed it's defaulted to true)
+  "ConnectionStrings": {
+    "DefaultConnection": "Server={YourRemoteOrLocalDBServer};Database=EventIngestionDb;..."
+  },
+  "RabbitMq": {
+    "Hostname": "{YourRemoteOrLocalRabbitMqServer}"
+  },
+  "RunMigrationsOnStartup": true
 }
+```
 
-UPDATE - https://localhost:7077/mapping-rules/id - Updates Mapping Rule based on id
-Reques body:
+### First Run
+
+When running the project for the first time:
+1. Set `RunMigrationsOnStartup` to `true` to automatically apply database migrations
+2. Default mapping rules will be seeded into `EventIngestionDb.dbo.MappingRules` table
+
+---
+
+## 📚 API Documentation
+
+Base URL: `https://localhost:7077`
+
+### Mapping Rules Endpoints
+
+#### Get All Mapping Rules
+```http
+GET /mapping-rules
+```
+Returns all mapping rules (both default and dynamic).
+
+#### Create Mapping Rule
+```http
+POST /mapping-rules
+```
+**Request Body:**
+```json
 {
-"externalField": "usr",
-"internalField": "PlayerId",
-"mappingRuleTypeId": 1/2 (1 - default, 2 - dynamic)
-"IsActive": true/false (Optional property. If not passed it's defaulted to current value)
+  "externalField": "usr",
+  "internalField": "PlayerId",
+  "mappingRuleTypeId": 1,
+  "isActive": true
 }
+```
+**Notes:**
+- `mappingRuleTypeId`: `1` = Default, `2` = Dynamic
+- `isActive`: Optional (defaults to `true`)
 
-DELETE - https://localhost:7077/mapping-rules/id - Deletes Mapping Rule based on id
-
-## API Endpoints for EventIngestion
-
-My approach on mapping externalFields to InternalFields is to at first try to map them with dynamic mapping rules, if there
-is no specific externalField mapping than to use default mapping rules. After that I am doing validation.
-If mapping rule was not found or required externalField value is empty, I return respective error message.
-
-There is a simple publishing simulation failure functionality added in PublishAsync method.
-Chance of failure can be adjusted from there by manipulating "FailureProbability" property.
-Because of the Tech Task requirements and to not go into overengineering, in case one event publishing endpoint call
-if publish is failed only failure respones is returned.
-In case 100 event publishing endpoint, failed events are saved in list and then 10 of them are printed just to showcase as well
-as 10 successfully published events.
-Real production environment approach would be to save failed events in db table and have worker which would try sending that
-events again, but only the ones that failed on publishing step and not on validation step.
-
-POST - https://localhost:7077/events - Maps external event to internal event and publishes it
-Reques body:
+#### Update Mapping Rule
+```http
+PUT /mapping-rules/{id}
+```
+**Request Body:**
+```json
 {
-"usr": "player_123",
-"amt": "25.50",
-"curr": "GEL",
-"ts": "2025-11-05T12:33:47Z"
+  "externalField": "usr",
+  "internalField": "PlayerId",
+  "mappingRuleTypeId": 1,
+  "isActive": false
 }
+```
+**Notes:**
+- `isActive`: Optional (retains current value if not provided)
 
-POST - https://localhost:7077/events/simulate - simulates creation of 100 events and publishes them.
-No Request body is needed
+#### Delete Mapping Rule
+```http
+DELETE /mapping-rules/{id}
+```
+
+---
+
+### Event Ingestion Endpoints
+
+#### Publish Single Event
+```http
+POST /events
+```
+**Request Body:**
+```json
+{
+  "usr": "player_123",
+  "amt": "25.50",
+  "curr": "GEL",
+  "ts": "2025-11-05T12:33:47Z"
+}
+```
+
+Maps an external event to internal format, validates it, and publishes to RabbitMQ.
+
+#### Simulate 100 Events
+```http
+POST /events/simulate
+```
+Generates and publishes 100 random events with:
+- Random player IDs
+- Random amounts (0.00 - 999.99)
+- Random currencies (USD, EUR, GBP, JPY, CAD)
+- Random timestamps (within last 24 hours)
+
+**Response includes:**
+- Total published count
+- Total failed count
+- First 10 published events (sample)
+- First 10 failed events (sample)
+
+---
+
+## 🔧 Implementation Details
+
+### Mapping Strategy
+1. **Dynamic rules first**: Attempts to map using dynamic mapping rules
+2. **Default rules fallback**: Uses default mapping rules if no dynamic match exists
+3. **Validation**: Validates mapped internal event before publishing
+4. **Error handling**: Returns detailed error messages for missing mappings or validation failures
+
+### Failure Simulation
+- Random publishing failures are simulated in the `PublishAsync` method
+- Failure probability can be adjusted via the `FailureProbability` constant (default: 10%)
+- Single event endpoint: Returns 503 error if publishing fails
+- Simulation endpoint: Collects failed events and reports them in the response
+
+### Production Considerations
+In a production environment, failed events should be:
+- **Stored in a database** (Dead Letter Queue pattern)
+- **Retried by a background worker** (only for infrastructure failures)
+- **Separated by failure type**:
+  - Validation failures → No retry (permanent errors)
+  - Publishing failures → Retry with exponential backoff (transient errors)
+
+---
+
+## 🛠️ Technology Stack
+- **.NET 9.0**
+- **Entity Framework Core** (database access)
+- **RabbitMQ** (message broker)
+- **FluentValidation** (input validation)
+- **Minimal APIs** (endpoint routing)
+
+---
+
+## 📝 License
+This project is licensed under the MIT License.
