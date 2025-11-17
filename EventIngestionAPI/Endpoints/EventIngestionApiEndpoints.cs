@@ -4,6 +4,7 @@ using EventIngestionAPI.IntegrationEvents;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace EventIngestionAPI.Endpoints;
 
@@ -52,22 +53,22 @@ public static class EventIngestionApiEndpoints
         const int eventCount = 100;
         var random = new Random();
         var currencies = new[] { "USD", "EUR", "GBP", "JPY", "CAD" };
+        var playerId = new[] {"clientId", "accountId", "userId", "playerId"};
         var publishedEvents = new List<InternalEvent>();
         var failedEvents = new List<object>();
 
         for (int i = 0; i < eventCount; i++)
         {
             // Generate random external event as JsonElement
-            var externalEvent = new
+            var externalEvent = new JsonObject
             {
-                player_id = $"player_{random.Next(1000, 9999)}",
-                amount = Math.Round((decimal)(random.NextDouble() * 1000), 2),
-                currency = currencies[random.Next(currencies.Length)],
-                occurred_at = DateTime.UtcNow.AddMinutes(-random.Next(0, 1440)).ToString("o")
+                [$"{playerId[random.Next(playerId.Length)]}"] = $"player_{random.Next(1000, 9999)}",
+                ["amount"] = Math.Round((decimal)(random.NextDouble() * 1000), 2),
+                ["currency"] = currencies[random.Next(currencies.Length)],
+                ["occurredAt"] = DateTime.UtcNow.AddMinutes(-random.Next(0, 1440)).ToString("o")
             };
 
-            var jsonString = JsonSerializer.Serialize(externalEvent);
-            var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(externalEvent);
 
             try
             {

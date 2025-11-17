@@ -8,12 +8,12 @@ public class InternalEventValidator : AbstractValidator<InternalEvent>
     public InternalEventValidator()
     {
         RuleFor(ie => ie.PlayerId)
-            .NotEmpty().WithMessage("PlayerId is required.");
+            .NotEmpty().WithMessage("PlayerId - Mapping rule was not found or field is empty. PlayerId is required.");
 
         RuleFor(ie => ie.Amount)
-            .NotNull().WithMessage("Amount is required.");
+            .NotNull().WithMessage("Amount - Mapping rule was not found or field is empty. Amount is required.");
 
         RuleFor(ie => ie.OccurredAt)
-            .NotNull().WithMessage("OccurredAt is required.");
+            .NotNull().WithMessage("OccurredAt - Mapping rule was not found or field is empty. OccurredAt is required.");
     }
 }
