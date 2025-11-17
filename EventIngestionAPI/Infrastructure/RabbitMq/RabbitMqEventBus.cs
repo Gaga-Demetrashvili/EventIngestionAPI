@@ -7,6 +7,8 @@ namespace EventIngestionAPI.Infrastructure.RabbitMq;
 public class RabbitMqEventBus : IEventBus
 {
     private readonly IRabbitMqConnection _rabbitMqConnection;
+    private static readonly Random _random = new Random();
+    private const double FailureProbability = 0.2; // 20% chance of failure
 
     public RabbitMqEventBus(IRabbitMqConnection rabbitMqConnection)
     {
@@ -15,6 +17,9 @@ public class RabbitMqEventBus : IEventBus
 
     public Task PublishAsync(Event @event)
     {
+        if (_random.NextDouble() < FailureProbability)
+            throw new InvalidOperationException("Simulated publishing failure: Unable to connect to message broker");
+
         var routingKey = @event.GetType().Name;
 
         using var channel = _rabbitMqConnection.Connection.CreateModel();
