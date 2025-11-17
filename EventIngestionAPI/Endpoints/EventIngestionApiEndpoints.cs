@@ -1,4 +1,5 @@
-﻿using EventIngestionAPI.Infrastructure.Services;
+﻿using EventIngestionAPI.Infrastructure.EventBus.Abstractions;
+using EventIngestionAPI.Infrastructure.Services;
 using EventIngestionAPI.IntegrationEvents;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +16,15 @@ public static class EventIngestionApiEndpoints
 
     internal static async Task<IResult> IngestEvent(JsonElement payload,
         [FromServices] IEventMapper eventMapper,
-        [FromServices] IValidator<InternalEvent> validator)
+        [FromServices] IValidator<InternalEvent> validator,
+        [FromServices] IEventBus eventBus)
     {
         var internalEvent = await eventMapper.Map(payload);
         var validationResult = validator.Validate(internalEvent);
         if (!validationResult.IsValid)
             return Results.UnprocessableEntity(validationResult.ToDictionary());
+
+        await eventBus.PublishAsync(internalEvent);
 
         return Results.Ok(new
         {

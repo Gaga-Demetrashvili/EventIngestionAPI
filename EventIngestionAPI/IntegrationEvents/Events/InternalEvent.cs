@@ -1,6 +1,8 @@
-﻿namespace EventIngestionAPI.IntegrationEvents;
+﻿using EventIngestionAPI.Infrastructure.EventBus;
 
-public class InternalEvent
+namespace EventIngestionAPI.IntegrationEvents;
+
+public record InternalEvent : Event
 {
     public string PlayerId { get; set; } = string.Empty;
     public decimal? Amount { get; set; }

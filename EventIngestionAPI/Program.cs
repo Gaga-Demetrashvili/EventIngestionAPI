@@ -1,5 +1,6 @@
 using EventIngestionAPI.Endpoints;
 using EventIngestionAPI.Infrastructure.Data.EntityFramework;
+using EventIngestionAPI.Infrastructure.RabbitMq;
 using EventIngestionAPI.Infrastructure.Services;
 using FluentValidation;
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSqlServerDatastore(builder.Configuration);
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddSingleton<IEventMapper, EventMapper>();
+builder.Services.AddRabbitMqEventBus(builder.Configuration);
 
 var app = builder.Build();
 
