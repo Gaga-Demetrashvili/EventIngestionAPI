@@ -133,7 +133,7 @@ Generates and publishes 100 random events with:
 
 ### Failure Simulation
 - Random publishing failures are simulated in the `PublishAsync` method
-- Failure probability can be adjusted via the `FailureProbability` constant (default: 10%)
+- Failure probability can be adjusted via the `FailureProbability` constant (default: 20%)
 - Single event endpoint: Returns 503 error if publishing fails
 - Simulation endpoint: Collects failed events and reports them in the response
 
