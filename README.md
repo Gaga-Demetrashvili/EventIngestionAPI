@@ -130,7 +130,7 @@ Generates and publishes 100 random events with:
 2. **Default rules fallback**: Uses default mapping rules if no dynamic match exists
 3. **Validation**: Validates mapped internal event before publishing
 4. **Error handling**: Returns detailed error messages for missing mappings or validation failures
-5. **Caching**: Because all requests rely on the same mapping data, a simple caching mechanism is used to improve performance.
+5. **Caching**: Because all requests rely on the same mapping data, a simple caching mechanism is used to improve performance.  
    **Note**: Updates in the database may not be reflected immediately, as the cache TTL is currently 2 minutes.
 
 ### Failure Simulation
