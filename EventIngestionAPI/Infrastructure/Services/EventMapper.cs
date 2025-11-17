@@ -13,7 +13,7 @@ public class EventMapper(IServiceScopeFactory scopeFactory) : IEventMapper
     private readonly SemaphoreSlim _lock = new(1, 1);
     private bool _initialized = false;
     private DateTime _lastLoad = DateTime.MinValue;
-    private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(5);
+    private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(2);
 
     private async Task EnsureInitialized()
     {
@@ -28,7 +28,8 @@ public class EventMapper(IServiceScopeFactory scopeFactory) : IEventMapper
 
             using var scope = scopeFactory.CreateScope();
             var mappingRuleStore = scope.ServiceProvider.GetRequiredService<IMappingRuleStore>();
-            var mappingRules = await mappingRuleStore.GetAll(trackChanges: false) ?? Enumerable.Empty<MappingRule>();
+                var mappingRules = (await mappingRuleStore.GetByCondition(
+                mr => mr.IsActive, trackChanges: false)) ?? Enumerable.Empty<MappingRule>();
 
             _dynamicMappingRules = mappingRules
                 .Where(mr => mr.MappingRuleTypeId == (int)MappingRuleTypeEnum.Dynamic)

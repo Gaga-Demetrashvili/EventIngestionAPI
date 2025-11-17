@@ -1,6 +1,7 @@
 ﻿using EventIngestionAPI.Entities;
 using EventIngestionAPI.Infrastructure.Data.EntityFramework.EntityConfiguration;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace EventIngestionAPI.Infrastructure.Data.EntityFramework;
 
@@ -23,6 +24,12 @@ public class MappingRuleContext : DbContext, IMappingRuleStore
     !trackChanges
         ? await MappingRules.AsNoTracking().ToListAsync()
         : await MappingRules.ToListAsync();
+
+    public async Task<IEnumerable<MappingRule>?> GetByCondition(Expression<Func<MappingRule, bool>> expression, bool trackChanges) =>
+        !trackChanges
+            ? await MappingRules.AsNoTracking().Where(expression).ToListAsync()
+            : await MappingRules.Where(expression).ToListAsync();
+
 
     public async Task CreateMappingRule(MappingRule mappingRule)
     {
