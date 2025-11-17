@@ -59,7 +59,21 @@ public class EventMapper(IServiceScopeFactory scopeFactory) : IEventMapper
     new(StringComparer.OrdinalIgnoreCase)
     {
         [nameof(InternalEvent.PlayerId)] = (ie, je) => ie.PlayerId = je.GetString() ?? string.Empty,
-        [nameof(InternalEvent.Amount)] = (ie, je) => ie.Amount = je.GetDecimal(),
+        [nameof(InternalEvent.Amount)] = (ie, je) =>
+        {
+            if (je.ValueKind == JsonValueKind.Number)
+            {
+                ie.Amount = je.GetDecimal();
+                return;
+            }
+
+            if (je.ValueKind == JsonValueKind.String &&
+                decimal.TryParse(je.GetString(), out var dec))
+            {
+                ie.Amount = dec;
+                return;
+            }
+        },
         [nameof(InternalEvent.Currency)] = (ie, je) => ie.Currency = je.GetString() ?? string.Empty,
         [nameof(InternalEvent.OccurredAt)] = (ie, je) => ie.OccurredAt = je.GetDateTime(),
     };
